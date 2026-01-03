@@ -29,8 +29,8 @@ export function LifeView({ width, height, birthDate }: LifeViewProps) {
 
     // Layout Calculations
     // We want a big rectangular block of dots.
-    const SAFE_AREA_TOP = height * 0.15; // Push down a bit
-    const SAFE_AREA_BOTTOM = height * 0.10;
+    const SAFE_AREA_TOP = height * 0.25; // Reserve top 25% for device UI
+    const SAFE_AREA_BOTTOM = height * 0.14;
     const SAFE_WIDTH_PADDING = width * 0.10; // 10% padding on sides
 
     const availableWidth = width - (SAFE_WIDTH_PADDING * 2);
