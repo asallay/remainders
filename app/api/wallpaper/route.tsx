@@ -40,28 +40,29 @@ export async function GET(request: NextRequest) {
 
     // --- Layout Calculations ---
 
-    // 1. Safe Zones (15% Top, 20% Bottom)
-    const SAFE_AREA_TOP = height * 0.15;
-    const SAFE_AREA_BOTTOM = height * 0.20;
+    // 1. Safe Zones (User requested "whole calendar a little down because it's too high")
+    // Increased Top Safe Zone from 15% to 25% to push content down
+    const SAFE_AREA_TOP = height * 0.25;
+    const SAFE_AREA_BOTTOM = height * 0.15; // Slightly reduced bottom to keep balance
     const SAFE_HEIGHT = height - SAFE_AREA_TOP - SAFE_AREA_BOTTOM;
 
-    // 2. Horizontal Spacing (User requested closer horizontally -> 15% padding)
-    const paddingX = width * 0.15;
+    // 2. Horizontal Spacing (15% padding)
+    const paddingX = width * 0.18;
     const availableWidth = width - (paddingX * 2);
     const cellWidth = availableWidth / COLUMNS;
 
-    // 3. Size Config
-    const dotSize = Math.min(cellWidth / 8, 16);
+    // 3. Size Config 
+    // Increased from /8 to /7, and max size from 16 to 20
+    const dotSize = Math.min(cellWidth / 7, 20);
     const dotGap = dotSize * 0.7;
     const monthLabelSize = dotSize * 1.6;
 
     // 4. Vertical Calculation
     const monthBlockHeight = monthLabelSize + dotSize + (6 * dotSize) + (5 * dotGap);
-    const rowGap = monthLabelSize * 2.0;
+    const rowGap = monthLabelSize * 1.0;
 
     // Stats Text Config
-    const statsFontSize = width * 0.035;
-    // Increased margin to move text down significantly
+    const statsFontSize = monthLabelSize;
     const statsMargin = rowGap * 4.0;
 
     const gridHeight = (ROWS * monthBlockHeight) + ((ROWS - 1) * rowGap);
@@ -194,11 +195,15 @@ export async function GET(request: NextRequest) {
               alignItems: 'center',
               fontSize: statsFontSize,
               fontFamily: 'monospace',
-              letterSpacing: '0.1em',
+              // letterSpacing removed as requested ("why there are spacing")
             }}
           >
             {/* Days Left -> Orange (ACCENT_COLOR) */}
-            <span style={{ color: ACCENT_COLOR, marginRight: '8px' }}>{daysLeft}d left · </span>
+            <span style={{ color: ACCENT_COLOR }}>{daysLeft}d left</span>
+
+            {/* Separator -> Grey/Text Color (User: "dot ... dosn't need to be orange") */}
+            <span style={{ color: TEXT_COLOR, margin: '0 8px' }}>·</span>
+
             {/* Percent -> Grey (TEXT_COLOR) */}
             <span style={{ color: TEXT_COLOR }}>{Math.round((currentDayOfYear / totalDays) * 100)}%</span>
           </div>

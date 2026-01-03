@@ -18,6 +18,30 @@ export const DEVICE_MODELS: DeviceModel[] = [
   // Apple iPhone Models
   {
     brand: 'Apple',
+    model: 'iPhone 17 Pro Max',
+    width: 1320,
+    height: 2868,
+  },
+  {
+    brand: 'Apple',
+    model: 'iPhone 17 Pro',
+    width: 1206,
+    height: 2622,
+  },
+  {
+    brand: 'Apple',
+    model: 'iPhone 17 Plus',
+    width: 1290,
+    height: 2796,
+  },
+  {
+    brand: 'Apple',
+    model: 'iPhone 17',
+    width: 1179,
+    height: 2556,
+  },
+  {
+    brand: 'Apple',
     model: 'iPhone 16 Pro Max',
     width: 1320,
     height: 2868,
