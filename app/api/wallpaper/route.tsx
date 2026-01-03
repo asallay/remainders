@@ -16,17 +16,15 @@ export const runtime = 'edge';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
-    const themeColor = searchParams.get('themeColor') || 'FFFFFF';
     const width = parseInt(searchParams.get('width') || '1170');
     const height = parseInt(searchParams.get('height') || '2532');
-    const viewMode = searchParams.get('viewMode') || 'year'; // Default to year for now as per request
 
-    // Colors
-    const BG_COLOR = '#111111';
-    const TEXT_COLOR = '#666666';
-    const PAST_COLOR = '#444444'; // Visible but dark
-    const TODAY_COLOR = `#${themeColor}`; // User theme or white
-    const FUTURE_COLOR = '#222222'; // Faint
+    // Colors Config (User Requested)
+    const BG_COLOR = '#1a1a1a'; // Dark, almost brown/grey mix
+    const TEXT_COLOR = '#888888'; // Grey for months and percent
+    const PAST_COLOR = '#FFFFFF'; // White for passed days
+    const ACCENT_COLOR = '#FF6B35'; // Orange for current day and "days left" text
+    const FUTURE_COLOR = '#404040'; // Darker grey for future dots
 
     // Year Logic
     const date = new Date();
@@ -40,23 +38,38 @@ export async function GET(request: NextRequest) {
     const COLUMNS = 3; // 3 Months per row
     const ROWS = 4;    // 4 Rows of months
 
-    // Calculate dimensions
-    // We want a clear 3x4 grid centered.
-    // Each "cell" contains a month name and a 7x6 dot grid.
+    // --- Layout Calculations ---
 
-    // Spacing
-    const paddingX = width * 0.1;
-    const paddingY = height * 0.15; // More space at top/bottom
+    // 1. Safe Zones (15% Top, 20% Bottom)
+    const SAFE_AREA_TOP = height * 0.15;
+    const SAFE_AREA_BOTTOM = height * 0.20;
+    const SAFE_HEIGHT = height - SAFE_AREA_TOP - SAFE_AREA_BOTTOM;
+
+    // 2. Horizontal Spacing (User requested closer horizontally -> 15% padding)
+    const paddingX = width * 0.15;
     const availableWidth = width - (paddingX * 2);
-    const availableHeight = height - (paddingY * 2);
-
     const cellWidth = availableWidth / COLUMNS;
-    const cellHeight = availableHeight / ROWS;
 
-    // Dot Config
-    const dotSize = Math.min(cellWidth / 10, 12); // Dynamic dot size
-    const dotGap = dotSize * 0.8;
-    const monthLabelSize = dotSize * 1.5;
+    // 3. Size Config
+    const dotSize = Math.min(cellWidth / 8, 16);
+    const dotGap = dotSize * 0.7;
+    const monthLabelSize = dotSize * 1.6;
+
+    // 4. Vertical Calculation
+    const monthBlockHeight = monthLabelSize + dotSize + (6 * dotSize) + (5 * dotGap);
+    const rowGap = monthLabelSize * 2.0;
+
+    // Stats Text Config
+    const statsFontSize = width * 0.035;
+    // Increased margin to move text down significantly
+    const statsMargin = rowGap * 4.0;
+
+    const gridHeight = (ROWS * monthBlockHeight) + ((ROWS - 1) * rowGap);
+    const totalContentHeight = gridHeight + statsMargin + statsFontSize;
+
+    // 5. Centering
+    const startY = SAFE_AREA_TOP + ((SAFE_HEIGHT - totalContentHeight) / 2);
+    const statsY = startY + gridHeight + statsMargin;
 
     // Helper to get days in month
     const getDaysInMonth = (year: number, monthIndex: number) => {
@@ -86,15 +99,14 @@ export async function GET(request: NextRequest) {
           globalDayCounter++;
 
           if (globalDayCounter < currentDayOfYear) {
-            color = PAST_COLOR;
+            color = PAST_COLOR; // White
           } else if (globalDayCounter === currentDayOfYear) {
-            color = TODAY_COLOR;
+            color = ACCENT_COLOR; // Orange
           } else {
             color = FUTURE_COLOR;
           }
         }
 
-        // Only render dot if valid day
         if (dayNum > 0 && dayNum <= daysInMonth) {
           const row = Math.floor(i / 7);
           const col = i % 7;
@@ -121,7 +133,7 @@ export async function GET(request: NextRequest) {
       const rowIndex = Math.floor(monthIndex / COLUMNS);
 
       const x = paddingX + (colIndex * cellWidth);
-      const y = paddingY + (rowIndex * cellHeight);
+      const y = startY + (rowIndex * (monthBlockHeight + rowGap));
 
       return (
         <div
@@ -170,23 +182,25 @@ export async function GET(request: NextRequest) {
             {monthCells}
           </div>
 
-          {/* Footer Stats */}
+          {/* Footer Stats - SWAPPED COLORS HERE */}
           <div
             style={{
               position: 'absolute',
-              bottom: height * 0.08,
+              top: statsY,
               left: 0,
               width: '100%',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              color: TODAY_COLOR,
-              fontSize: width * 0.04,
+              fontSize: statsFontSize,
               fontFamily: 'monospace',
               letterSpacing: '0.1em',
             }}
           >
-            {daysLeft}d left · {Math.round((currentDayOfYear / totalDays) * 100)}%
+            {/* Days Left -> Orange (ACCENT_COLOR) */}
+            <span style={{ color: ACCENT_COLOR, marginRight: '8px' }}>{daysLeft}d left · </span>
+            {/* Percent -> Grey (TEXT_COLOR) */}
+            <span style={{ color: TEXT_COLOR }}>{Math.round((currentDayOfYear / totalDays) * 100)}%</span>
           </div>
         </div>
       ),
