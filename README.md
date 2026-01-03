@@ -18,7 +18,7 @@ Visualize your life progress or year at a glance. Generate beautiful, time-aware
 - And much more...
 
 <p align="center">
-  <img src="public/Year.png" alt="Year View" width="45%" />
+  <img src="public/Year.webp" alt="Year View" width="45%" />
   &nbsp;&nbsp;
   <img src="public/Life.webp" alt="Life View" width="45%" />
 </p>
