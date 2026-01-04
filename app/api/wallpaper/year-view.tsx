@@ -7,9 +7,10 @@ import {
 interface YearViewProps {
     width: number;
     height: number;
+    isMondayFirst: boolean;
 }
 
-export function YearView({ width, height }: YearViewProps) {
+export function YearView({ width, height, isMondayFirst }: YearViewProps) {
     // Colors Config
     const BG_COLOR = '#1a1a1a'; // Dark background
     const TEXT_COLOR = '#888888'; // Grey for text
@@ -66,6 +67,10 @@ export function YearView({ width, height }: YearViewProps) {
     };
 
     const getFirstDayOfMonth = (year: number, monthIndex: number) => {
+        if (isMondayFirst) {
+            const day = new Date(year, monthIndex, 1).getDay();
+            return (day === 0 ? 6 : day - 1);
+        }
         return new Date(year, monthIndex, 1).getDay(); // 0 = Sun, etc.
     };
 

@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = request.nextUrl;
     const width = parseInt(searchParams.get('width') || '1170');
     const height = parseInt(searchParams.get('height') || '2532');
+    const isMondayFirst = searchParams.get('isMondayFirst') === '1';
     const viewMode = searchParams.get('viewMode') || 'year';
     const birthDate = searchParams.get('birthDate') || '';
 
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
       content = <LifeView width={width} height={height} birthDate={birthDate} />;
     } else {
       // Default to Year View
-      content = <YearView width={width} height={height} />;
+      content = <YearView width={width} height={height} isMondayFirst={isMondayFirst} />;
     }
 
     return new ImageResponse(
