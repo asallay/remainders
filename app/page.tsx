@@ -23,6 +23,8 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     try {
       const savedProfile = localStorage.getItem(STORAGE_KEY);
       if (savedProfile) {
@@ -45,6 +47,8 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     if (birthDate && selectedDevice) {
       const profile: UserProfile = {
         birthDate,
@@ -57,7 +61,12 @@ export default function Home() {
         },
         viewMode,
       };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+        console.log('Profile saved:', profile);
+      } catch (error) {
+        console.error('Failed to save profile:', error);
+      }
     }
   }, [birthDate, selectedDevice, viewMode]);
 
